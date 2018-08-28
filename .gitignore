@@ -13,3 +13,4 @@ db.sqlite3
 /static
 /static_cdn
 static_my_proj/
+/staticfiles
