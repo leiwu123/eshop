@@ -129,3 +129,7 @@ STATICFILES_DIRS = (
     )
 MEDIA_URL = '/media/'
 MEDIA_ROOT = os.path.join(BASE_DIR, 'static', 'media')
+
+###Stripe Settings###
+STRIPE_PUBLISHABLE_KEY = "pk_live_Kiwz0AV00PkutYgWdSXKaKlA"
+STRIPE_SECRET_KEY = "sk_live_RuM1YwGOnywI7JPvkYPdgt2M"
