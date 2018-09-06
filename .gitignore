@@ -14,3 +14,5 @@ db.sqlite3
 /static_cdn
 static_my_proj/
 /staticfiles
+sendgrid.env
+sendgrid.env

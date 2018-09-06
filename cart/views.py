@@ -1,9 +1,19 @@
+# import sendgrid
+# import os
+# from sendgrid.helpers.mail import *
 from django.shortcuts import render, redirect, get_object_or_404
 from shop.models import Product
 from .models import Cart, CartItem
 from django.core.exceptions import ObjectDoesNotExist
 import stripe
 from django.conf import settings
+from order.models import Order, OrderItem
+from django.template.loader import get_template
+from django.core.mail import EmailMessage, send_mail
+from django.conf import settings
+from django.utils.safestring import mark_safe
+
+
 
 def _cart_id(request):
     cart = request.session.session_key
@@ -53,6 +63,16 @@ def cart_detail(request, total=0, counter=0, cart_items = None):
         try:
             token = request.POST['stripeToken']
             email = request.POST['stripeEmail']
+            billingName = request.POST['stripeBillingName']
+            billingAddress1 = request.POST['stripeBillingAddressLine1']
+            billingCity = request.POST['stripeBillingAddressCity']
+            billingPostcode = request.POST['stripeBillingAddressZip']
+            billingCountry = request.POST['stripeBillingAddressCountryCode']
+            shippingName = request.POST['stripeShippingName']
+            shippingAddress1 = request.POST['stripeShippingAddressLine1']
+            shippingCity = request.POST['stripeShippingAddressCity']
+            shippingPostcode = request.POST['stripeShippingAddressZip']
+            shippingCountry = request.POST['stripeShippingAddressCountryCode']
             customer = stripe.Customer.create(
                     email=email,
                     source = token
@@ -63,6 +83,49 @@ def cart_detail(request, total=0, counter=0, cart_items = None):
                     description=description,
                     customer=customer.id
                 )
+            ''' Creating the order '''
+            try:
+                order_details = Order.objects.create(
+                    token = token,
+                    total = total,
+                    emailAddress = email,
+                    billingName = billingName,
+                    billingAddress1 = billingAddress1,
+                    billingCity = billingCity,
+                    billingPostcode = billingPostcode,
+                    billingCountry = billingCountry,
+                    shippingName = shippingName,
+                    shippingAddress1 = shippingAddress1,
+                    shippingCity = shippingCity,
+                    shippingPostcode = shippingPostcode,
+                    shippingCountry = shippingCountry,
+                )
+                order_details.save()
+                for order_item in cart_items:
+                    oi = OrderItem.objects.create(
+                        product = order_item.product.name,
+                        quantity = order_item.quantity,
+                        price = order_item.product.price,
+                        order = order_details
+                    )
+                    oi.save()
+                    '''Reduce stock when order is placed or saved'''
+                    product = Product.objects.get(id=order_item.product.id)
+                    product.stock = int(order_item.product.stock - order_item.quantity)
+                    product.save()
+                    order_item.delete()
+                    '''The terminal will print this message when the order is saved'''
+                    print('The order has been created')
+                # return redirect('shop:allProdCat')
+                try:
+                    '''Calling the sendEmail function'''
+                    sendEmail(order_details.id)
+                    print('The order email has been sent to the customer.')
+                except IOError as e:
+                    return e
+                return redirect('order:thanks', order_details.id)
+            except ObjectDoesNotExist:
+                pass
         except stripe.error.CardError as e:
                 return False, e
     return render(request, 'cart.html', dict(cart_items = cart_items, total = total, counter = counter, data_key = data_key, stripe_total = stripe_total, description = description ))
@@ -84,3 +147,66 @@ def full_remove(request, product_id):
     cart_item = CartItem.objects.get(product=product, cart=cart)
     cart_item.delete()
     return redirect('cart:cart_detail')
+
+# def sendEmail(order_id):
+# 	transaction = Order.objects.get(id=order_id)
+# 	order_items = OrderItem.objects.filter(order=transaction)
+# 	try:
+# 		'''Sending the order'''
+# 		subject = "Perfect Cushion Store - New Order #{}".format(transaction.id)
+# 		to = ['{}'.format(transaction.emailAddress)]
+# 		from_email = "orders@perfectcushionstore.com"
+# 		order_information = {
+# 		'transaction' : transaction,
+# 		'order_items' :	order_items
+# 		}
+# 		message = get_template('email/email.html').render(order_information)
+# 		msg = EmailMessage(subject, message, to=to, from_email=from_email)
+# 		msg.content_subtype = 'html'
+# 		msg.send()
+# 	except IOError as e:
+# 		return e
+
+def sendEmail(order_id):
+    transaction = Order.objects.get(id=order_id)
+    order_items = OrderItem.objects.filter(order=transaction)
+    try:
+        '''Sending the order to the customer'''
+        # subject = "Perfect Cushion Store - New Order #{}".format(transaction.id)
+        # to = ['{}'.format(transaction.emailAddress)]
+        # print(to)
+        # from_email = "orders.perfectcushionstore.com"
+        # order_information = {
+        # 'transaction' : transaction,
+        # 'order_items' : order_items
+        # }
+        # message = get_template('email/email.html').render(order_information)
+        # msg = EmailMessage(subject, message, to=to, from_email=from_email)
+        # print(message)
+        # msg.content_subtype = 'html'
+        # msg.send()
+
+        subject = "Bunny and Meow - New Order #{}".format(transaction.id)
+        to = ['{}'.format(transaction.emailAddress)]
+        # to_email = ['leiwuart@gmail.com']
+        from_email = "noreply@bunnyandmeow.com"
+        order_information = {
+        'transaction' : transaction,
+        'order_items' : order_items
+        }
+        print(order_information)
+        message = get_template('email/email.html').render(order_information)
+        print(message)
+        msg = EmailMessage(subject, mark_safe(message), to=to, from_email=from_email)
+        msg.content_subtype = 'html'
+        msg.send()
+        # send_mail(subject, mark_safe(message), from_email, to,fail_silently=False)
+    except IOError as e:
+        return e
+
+
+def send(request):
+    send_mail('hello from bunnyandmeow', 'hello there. this is an new message.', 'jobspecific@hotmail.com', ['leiwuart@gmail.com'], fail_silently=False)
+
+    return redirect('shop:allProdCat')
+

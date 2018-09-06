@@ -14,10 +14,12 @@ Including another URLconf
     2. Add a URL to urlpatterns:  path('blog/', include('blog.urls'))
 """
 from django.contrib import admin
-from django.urls import path, include
+from django.urls import path, re_path, include
 from shop import views
 from django.conf import settings
 from django.conf.urls.static import static
+from django.contrib.auth import views as authViews 
+
 
 urlpatterns = [
     path('admin/', admin.site.urls),
@@ -25,6 +27,21 @@ urlpatterns = [
     path('shop/', include('shop.urls')),
     path('search/', include('search_app.urls')),
     path('cart/', include('cart.urls')),
+    path('order/', include('order.urls')),
+    path('account/create/', views.signupView, name='signup'),
+    path('account/login/', views.signinView, name='signin'),
+    path('account/logout/', views.signoutView, name='signout'),
+    # path('', include('django.contrib.auth.urls')),
+    # re_path('account/password_reset/', authViews.password_reset),
+    re_path(r'^account/password_reset/$', authViews.password_reset, {'template_name' : 'accounts/reset_password.html' }, name='password_reset'),
+    re_path(r'^account/password_reset/done/$', authViews.password_reset_done, {'template_name': 'accounts/reset_password_done.html'}, name='password_reset_done'),
+    re_path(r'^account/reset/(?P<uidb64>[0-9A-Za-z_\-]+)/(?P<token>[0-9A-Za-z]{1,13}-[0-9A-Za-z]{1,20})/$', authViews.password_reset_confirm, {'template_name': 'accounts/reset_password_confirm.html'}, name='password_reset_confirm'),
+    re_path(r'^account/reset/done/$', authViews.password_reset_complete, {'template_name': 'accounts/reset_done.html'}, name='password_reset_complete'),
+    # re_path('account/password_reset/', authViews.password_reset, {'template_name' : '/accounts/reset_password.html' }, name='password_reset'),
+	# re_path('account/password_reset/done/', authViews.password_reset_done, {'template_name': 'accounts/reset_password_done.html'}, name='password_reset_done'),
+	# re_path('account/reset/(?P<uidb64>[0-9A-Za-z_\-]+)/(?P<token>[0-9A-Za-z]{1,13}-[0-9A-Za-z]{1,20})/', authViews.password_reset_confirm, {'template_name': 'accounts/reset_password_confirm.html'}, name='password_reset_confirm'),
+	# re_path('account/reset/done/', authViews.password_reset_complete, {'template_name': 'accounts/reset_done.html'}, name='password_reset_complete'),
+    # path('', include('django.contrib.auth.urls'))
 ]
 
 if settings.DEBUG:

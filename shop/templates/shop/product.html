@@ -31,7 +31,7 @@
               Product Description
             </p>
             <p class="text-justify my_prod_text">
-              {{ product.description }}
+              {{ product.description|safe }}
             </p>
             {% if product.stock <= 0 %}
               <p class="text-justify my_prod_text"><b>Out of Stock</b></p>

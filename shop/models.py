@@ -1,12 +1,12 @@
 from django.db import models
 from django.urls import reverse
-
+from ckeditor.fields import RichTextField
 
 
 class Category(models.Model):
 	name = models.CharField(max_length=250, unique=True)
 	slug = models.SlugField(max_length=250, unique=True)
-	description = models.TextField(blank=True)
+	description = RichTextField(blank=True)
 	image = models.ImageField(upload_to='category', blank=True)
 
 	class Meta:
@@ -23,7 +23,7 @@ class Category(models.Model):
 class Product(models.Model):
 	name = models.CharField(max_length=250, unique=True)
 	slug = models.SlugField(max_length=250, unique=True)
-	description = models.TextField(blank=True)
+	description = RichTextField(blank=True)
 	category = models.ForeignKey(Category, on_delete=models.CASCADE)
 	price = models.DecimalField(max_digits=10, decimal_places=2)
 	image = models.ImageField(upload_to='product', blank=True)
@@ -42,5 +42,3 @@ class Product(models.Model):
 
 	def __str__(self):
 		return '{}'.format(self.name)
-
-	

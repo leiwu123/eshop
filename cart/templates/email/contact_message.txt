@@ -1,0 +1,7 @@
+you order has been received :
+Shipping to: 
+{{ transaction.billingName }},
+{{ transaction.billingAddress1 }},
+{{ transaction.billingCity }},
+{{ transaction.billingPostcode }},
+{{ transaction.billingCountry }}
