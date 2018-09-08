@@ -134,26 +134,7 @@ STATICFILES_DIRS = (
 MEDIA_URL = '/media/'
 MEDIA_ROOT = os.path.join(BASE_DIR, 'static', 'media')
 
-###Stripe Settings###
-# STRIPE_PUBLISHABLE_KEY = "pk_live_Kiwz0AV00PkutYgWdSXKaKlA"
-# STRIPE_SECRET_KEY = "sk_live_RuM1YwGOnywI7JPvkYPdgt2M"
-STRIPE_PUBLISHABLE_KEY = "pk_test_ZRSerO2DPbyoLkIsLB6FcndB"
-STRIPE_SECRET_KEY = "sk_test_oqfOjDHe2O1QrXkf2jmmunTI"
-CRISPY_TEMPLATE_PACK = 'bootstrap4'
 
-###EmailMessage Settings###
-# EMAIL_HOST = 'smtp.sendgrid.net'
-# EMAIL_PORT = '587'
-# EMAIL_USE_TLS = True
-# EMAIL_HOST_USER = 'postmaster@email.bunnyandmeow.com'
-# EMAIL_HOST_PASSWORD = 'eec1f98fc5baa2074b3919476d4354ec-f45b080f-65a1e473'
 
-SEND_GRID_API_KEY = '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'
-EMAIL_HOST = 'smtp.sendgrid.net'
-EMAIL_HOST_USER = 'leiwu'
-EMAIL_HOST_PASSWORD = 'django123'
-EMAIL_PORT = 587
-EMAIL_USE_TLS = True
-DEFAULT_FROM_EMAIL = 'jobspecific@hotmail.com'
-ACCOUNT_EMAIL_SUBJECT_PREFIX = 'Contact email received from website'
-EMAIL_BACKEND = 'django.core.mail.backends.smtp.EmailBackend'
+
+

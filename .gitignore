@@ -7,12 +7,11 @@
 *.pyc
 __pycache__/
 local_settings.py
-db.sqlite3
+# db.sqlite3
 /.vscode
-/media
-/static
-/static_cdn
-static_my_proj/
+# /media
+# /static
+# /static_cdn
+# static_my_proj/
 /staticfiles
-sendgrid.env
-sendgrid.env
+# sendgrid.env
